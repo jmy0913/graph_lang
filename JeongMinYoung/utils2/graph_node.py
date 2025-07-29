@@ -9,7 +9,7 @@ from .normalize_code_search import find_corporation_code, parse_extracted_text
 from .retreiver_setting import faiss_retriever_loading
 from .api_get import get_financial_state
 
-accounting_retriever, business_retriever, business_retriever2, self_retriever = faiss_retriever_loading()
+accounting_retriever, business_retriever = faiss_retriever_loading()
 
 simple_chain, classification_chain, extract_chain,hybrid_chain1, hybrid_chain2, hybrid_chain3,account_chain1, account_chain2, account_chain3,business_chain1, business_chain2, business_chain3, financial_chain1, financial_chain2, financial_chain3 = create_chain()
 
@@ -237,7 +237,7 @@ def handle_financial3(state: ChatState) -> dict:
 
 def handle_business1(state: ChatState) -> dict:
     question = state["question"]
-    docs = self_retriever.get_relevant_documents(question)
+    docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
     answer = business_chain1.invoke({"context": context, "question": question})
     updated_history = state.get("chat_history", []).copy()
@@ -252,7 +252,7 @@ def handle_business1(state: ChatState) -> dict:
 
 def handle_business2(state: ChatState) -> dict:
     question = state["question"]
-    docs = self_retriever.get_relevant_documents(question)
+    docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
     answer = business_chain2.invoke({"context": context, "question": question})
     updated_history = state.get("chat_history", []).copy()
@@ -268,7 +268,7 @@ def handle_business2(state: ChatState) -> dict:
 
 def handle_business3(state: ChatState) -> dict:
     question = state["question"]
-    docs = self_retriever.get_relevant_documents(question)
+    docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
     answer = business_chain3.invoke({"context": context, "question": question})
     updated_history = state.get("chat_history", []).copy()
