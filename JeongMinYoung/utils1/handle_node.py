@@ -10,21 +10,6 @@ simple_chain, classification_chain, extract_chain,hybrid_chain1, hybrid_chain2, 
 accounting_retriever, business_retriever, business_retriever2, self_retriever = faiss_retriever_loading()
 
 
-from typing import TypedDict, Literal, List, Optional
-
-class ChatTurn(TypedDict):
-    role: Literal["user", "assistant"]
-    content: str
-
-class ChatState(TypedDict, total=False):
-    question: str
-    company: Optional[str]
-    year: Optional[str]
-    route: Optional[str]
-    answer: Optional[str]
-    chat_history: List[ChatTurn]
-
-
 # 초급 회계 질문 답변 분기 함수
 def handle_accounting1(question: str) -> str:
     print("📥 accounting 처리 시작")

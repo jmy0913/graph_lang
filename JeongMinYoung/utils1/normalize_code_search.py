@@ -37,21 +37,16 @@ def normalize_company_name(user_input: str, corp_list: list[dict]) -> str:
 # extract chain이 준 응답에서 회사명과 연도 추출하는 함수
 def parse_extracted_text(text: str) -> dict:
     company_match = re.search(r"회사\s*:\s*(.+)", text)
-    year_match = re.search(r"연도\s*:\s*(\d{4}(?:,\s*\d{4})*)", text)
+    year_match = re.search(r"연도\s*:\s*(\d{4}(?:,\s*\d{4})*)", text)  # 여러 연도 대응 가능
 
     company = company_match.group(1).strip() if company_match else None
-    if company and company.lower() in ["없음", "none", "no", "x"]:
-        company = None
-
-    years = year_match.group(1) if year_match else "2024"
-    year_list = [y.strip() for y in years.split(",")]
+    year_str = year_match.group(1) if year_match else "2024"
+    years = [y.strip() for y in year_str.split(",")]
 
     return {
         "company": company,
-        "year_list": year_list
+        "year_list": years
     }
-
-
 
 # 회사명으로 회사코드 가져오는 함수
 def find_corporation_code(company_name: str) -> str:
