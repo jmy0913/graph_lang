@@ -185,7 +185,7 @@ def handle_hybrid1(state: ChatState) -> dict:
     return {
         **state,
         "answer": answer,
-        "chat_history": updated_history  # ✅ 추가
+        "chat_history": updated_history
     }
 
 def elief(state: ChatState) -> dict:
