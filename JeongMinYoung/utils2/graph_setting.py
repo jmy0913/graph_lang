@@ -37,8 +37,8 @@ def graph_setting():
         {
             "accounting": "extract",
             "finance": "extract",
-            "business": "extract",
             "hybrid": "extract",
+            "business": "extract",
             "simple": "simple"
         }
     )
