@@ -4,8 +4,6 @@
 - LANGSMITH_ENDPOINT=https://api.smith.langchain.com/
 - skn14_langchain=
 - LANGSMITH_TRACING=
-- TAVILY_API_KEY=
-- COHERE_API_KEY=
 - DART_API_KEY=
 - OPENAI_API_KEY=
 - NAVER_CLIENT_ID=
