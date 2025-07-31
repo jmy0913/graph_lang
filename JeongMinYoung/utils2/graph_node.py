@@ -61,8 +61,12 @@ def extract_entities(state: ChatState) -> dict:
     question = state["question"]
     prev_company = state.get("company")
     prev_years = state.get("year")
+    chat_history = state.get("chat_history", [])
 
-    result = extract_chain.invoke({"question": question})
+    # 최근 대화 몇 개만 chat_history로 넣어줌
+    chat_history_str = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    result = extract_chain.invoke({"question": question, "chat_history": chat_history_str})
     # result는 문자열이므로 바로 사용
     parsed = parse_extracted_text(result)
 
@@ -95,7 +99,15 @@ def handle_accounting1(state: ChatState) -> dict:
     question = state["question"]
     docs = accounting_retriever.invoke(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = account_chain1.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    # 최근 대화 몇 개만 chat_history로 넣어줌
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = account_chain1.invoke({"context": context, "question": question, "chat_history": chat_history})
+
+
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -110,7 +122,14 @@ def handle_accounting2(state: ChatState) -> dict:
     question = state["question"]
     docs = accounting_retriever.invoke(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = account_chain2.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    # 최근 대화 몇 개만 chat_history로 넣어줌
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = account_chain2.invoke({"context": context, "question": question, "chat_history": chat_history})
+
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -125,7 +144,13 @@ def handle_accounting3(state: ChatState) -> dict:
     question = state["question"]
     docs = accounting_retriever.invoke(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = account_chain3.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    # 최근 대화 몇 개만 chat_history로 넣어줌
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = account_chain3.invoke({"context": context, "question": question, "chat_history": chat_history})
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -152,10 +177,16 @@ def handle_financial1(state: ChatState) -> dict:
             fin_blocks.append(f"📅 {y}년 재무제표:\n" + "\n".join(rows))
 
     structured_financial = "\n\n".join(fin_blocks)
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = financial_chain1.invoke({
         "financial_data": structured_financial,
         "question": question,
         "resolved_corp_name": company,
+        "chat_history": chat_history
     })
 
     updated_history = state.get("chat_history", []).copy()
@@ -184,11 +215,18 @@ def handle_financial2(state: ChatState) -> dict:
             fin_blocks.append(f"📅 {y}년 재무제표:\n" + "\n".join(rows))
 
     structured_financial = "\n\n".join(fin_blocks)
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = financial_chain2.invoke({
         "financial_data": structured_financial,
         "question": question,
         "resolved_corp_name": company,
+        "chat_history": chat_history
     })
+
 
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
@@ -216,10 +254,16 @@ def handle_financial3(state: ChatState) -> dict:
             fin_blocks.append(f"📅 {y}년 재무제표:\n" + "\n".join(rows))
 
     structured_financial = "\n\n".join(fin_blocks)
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = financial_chain3.invoke({
         "financial_data": structured_financial,
         "question": question,
         "resolved_corp_name": company,
+        "chat_history": chat_history
     })
 
     updated_history = state.get("chat_history", []).copy()
@@ -239,7 +283,12 @@ def handle_business1(state: ChatState) -> dict:
     question = state["question"]
     docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = business_chain1.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = business_chain1.invoke({"context": context, "question": question, "chat_history": chat_history})
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -254,7 +303,13 @@ def handle_business2(state: ChatState) -> dict:
     question = state["question"]
     docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = business_chain2.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = business_chain2.invoke({"context": context, "question": question, "chat_history": chat_history})
+
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -270,7 +325,13 @@ def handle_business3(state: ChatState) -> dict:
     question = state["question"]
     docs = business_retriever.get_relevant_documents(question)
     context = "\n\n".join(doc.page_content for doc in docs)
-    answer = business_chain3.invoke({"context": context, "question": question})
+
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
+    answer = business_chain3.invoke({"context": context, "question": question, "chat_history": chat_history})
+
     updated_history = state.get("chat_history", []).copy()
     updated_history.append({"role": "user", "content": question})
     updated_history.append({"role": "assistant", "content": answer})
@@ -303,11 +364,16 @@ def handle_hybrid1(state: ChatState) -> dict:
     acct = "\n\n".join(doc.page_content for doc in acct_docs)
     biz = "\n\n".join(doc.page_content for doc in biz_docs)
 
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = hybrid_chain1.invoke({
         "question": question,
         "acct": acct,
         "biz": biz,
-        "fin": fin
+        "fin": fin,
+        "chat_history": chat_history
     })
 
     updated_history = state.get("chat_history", []).copy()
@@ -342,11 +408,16 @@ def handle_hybrid2(state: ChatState) -> dict:
     acct = "\n\n".join(doc.page_content for doc in acct_docs)
     biz = "\n\n".join(doc.page_content for doc in biz_docs)
 
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = hybrid_chain2.invoke({
         "question": question,
         "acct": acct,
         "biz": biz,
-        "fin": fin
+        "fin": fin,
+        "chat_history": chat_history
     })
 
     updated_history = state.get("chat_history", []).copy()
@@ -381,11 +452,16 @@ def handle_hybrid3(state: ChatState) -> dict:
     acct = "\n\n".join(doc.page_content for doc in acct_docs)
     biz = "\n\n".join(doc.page_content for doc in biz_docs)
 
+    chat_history = state.get("chat_history", [])
+
+    chat_history = "\n".join([f"{turn['role']}: {turn['content']}" for turn in chat_history[-4:]])
+
     answer = hybrid_chain3.invoke({
         "question": question,
         "acct": acct,
         "biz": biz,
-        "fin": fin
+        "fin": fin,
+        "chat_history": chat_history
     })
 
     updated_history = state.get("chat_history", []).copy()
